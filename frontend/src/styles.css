@@ -1,0 +1,122 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource/bebas-neue";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bebas Neue", "Inter Variable", sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-flame: var(--flame);
+  --color-flame-foreground: var(--flame-foreground);
+  --color-ember: var(--ember);
+}
+
+:root {
+  --radius: 0.5rem;
+
+  /* Dark by default — sporty motorcycle showroom */
+  --background: oklch(0.16 0.01 60);
+  --foreground: oklch(0.97 0.005 60);
+
+  --card: oklch(0.21 0.012 60);
+  --card-foreground: oklch(0.97 0.005 60);
+
+  --popover: oklch(0.19 0.012 60);
+  --popover-foreground: oklch(0.97 0.005 60);
+
+  /* Primary = fiery red-orange */
+  --primary: oklch(0.65 0.22 30);
+  --primary-foreground: oklch(0.99 0 0);
+
+  --secondary: oklch(0.26 0.015 60);
+  --secondary-foreground: oklch(0.97 0.005 60);
+
+  --muted: oklch(0.24 0.01 60);
+  --muted-foreground: oklch(0.72 0.02 60);
+
+  --accent: oklch(0.28 0.015 60);
+  --accent-foreground: oklch(0.97 0.005 60);
+
+  --destructive: oklch(0.6 0.24 25);
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --border: oklch(0.28 0.015 60);
+  --input: oklch(0.24 0.012 60);
+  --ring: oklch(0.65 0.22 30);
+
+  --flame: oklch(0.72 0.2 55);
+  --flame-foreground: oklch(0.15 0.01 60);
+  --ember: oklch(0.58 0.24 25);
+
+  --gradient-flame: linear-gradient(135deg, oklch(0.72 0.2 55), oklch(0.6 0.24 25));
+  --gradient-hero: linear-gradient(180deg, oklch(0.16 0.01 60 / 0.2) 0%, oklch(0.12 0.01 60 / 0.95) 100%);
+  --shadow-flame: 0 20px 60px -20px oklch(0.6 0.24 25 / 0.55);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    background-color: var(--color-background);
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+}
+
+@utility text-gradient-flame {
+  background-image: var(--gradient-flame);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-gradient-flame {
+  background-image: var(--gradient-flame);
+}
+
+@utility shadow-flame {
+  box-shadow: var(--shadow-flame);
+}
