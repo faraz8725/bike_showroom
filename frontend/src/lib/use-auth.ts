@@ -1,43 +1,62 @@
 import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+
+import { clearToken, getToken } from "@/lib/auth-token";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+type MeResponse = {
+  user: { id: string; email: string; isAdmin: boolean };
+};
 
 export interface AuthState {
-  session: Session | null;
-  user: User | null;
+  session: null;
+  user: { id: string; email: string } | null;
   isAdmin: boolean;
   loading: boolean;
 }
 
 export function useAuth(): AuthState {
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthState["user"]>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
+    async function loadMe() {
+      const token = getToken();
+      if (!token) {
+        setUser(null);
+        setIsAdmin(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const resp = await fetch(`${API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = (await resp.json().catch(() => ({}))) as Partial<MeResponse>;
+
+        if (!resp.ok || !data.user) {
+          clearToken();
+          setUser(null);
+          setIsAdmin(false);
+          setLoading(false);
+          return;
+        }
+
+        setUser({ id: data.user.id, email: data.user.email });
+        setIsAdmin(!!data.user.isAdmin);
+      } catch {
+        // keep loading false, but don't wipe token (network issue)
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMe();
   }, []);
 
-  useEffect(() => {
-    if (!session?.user) {
-      setIsAdmin(false);
-      return;
-    }
-    supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", session.user.id)
-      .eq("role", "admin")
-      .maybeSingle()
-      .then(({ data }) => setIsAdmin(!!data));
-  }, [session?.user?.id]);
-
-  return { session, user: session?.user ?? null, isAdmin, loading };
+  return { session: null, user, isAdmin, loading };
 }
+
+

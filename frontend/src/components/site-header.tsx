@@ -1,13 +1,19 @@
 import { Link } from "@tanstack/react-router";
+
+// If you only use React Router for navigation, avoid mixing with TanStack Router.
+// (This file is .tsx and must be valid TS/JS for Vite.)
 import { Flame, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { clearToken, getToken } from "@/lib/auth-token";
 import { Button } from "@/components/ui/button";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export function SiteHeader() {
   const { user, isAdmin } = useAuth();
 
   return (
+
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6">
         <Link to="/" className="flex min-w-0 items-center gap-2">
@@ -36,10 +42,21 @@ export function SiteHeader() {
             <Button
               variant="ghost"
               size="sm"
-              className="gap-1.5"
               onClick={async () => {
-                await supabase.auth.signOut();
+                const token = getToken();
+                try {
+                  if (token) {
+                    await fetch(`${API_URL}/auth/logout`, {
+                      method: "POST",
+                      headers: { Authorization: `Bearer ${token}` },
+                    });
+                  }
+                } finally {
+                  clearToken();
+                  window.location.assign("/auth");
+                }
               }}
+              className="gap-1.5"
             >
               <LogOut className="h-4 w-4" /> Sign out
             </Button>
@@ -55,3 +72,4 @@ export function SiteHeader() {
     </header>
   );
 }
+
